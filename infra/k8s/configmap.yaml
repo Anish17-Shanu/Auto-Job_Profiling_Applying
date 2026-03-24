@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: autojob-config
+  namespace: autojob
+data:
+  APP_NAME: Auto-Job Profiling Applying API
+  ENVIRONMENT: production
+  ACCESS_TOKEN_EXPIRE_MINUTES: "720"
+  CORS_ORIGINS: http://autojob-web
+  API_BASE_URL: http://autojob-api:8000
+  WORKER_POLL_SECONDS: "3"
+

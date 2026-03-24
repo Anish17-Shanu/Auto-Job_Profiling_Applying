@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: autojob-api
+  namespace: autojob
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: autojob-api
+  template:
+    metadata:
+      labels:
+        app: autojob-api
+    spec:
+      containers:
+        - name: api
+          image: autojob-api:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: autojob-config
+            - secretRef:
+                name: autojob-secrets
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 8000
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: autojob-api
+  namespace: autojob
+spec:
+  selector:
+    app: autojob-api
+  ports:
+    - port: 8000
+      targetPort: 8000
+

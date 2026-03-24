@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: autojob-web
+  namespace: autojob
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: autojob-web
+  template:
+    metadata:
+      labels:
+        app: autojob-web
+    spec:
+      containers:
+        - name: web
+          image: autojob-web:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: autojob-web
+  namespace: autojob
+spec:
+  selector:
+    app: autojob-web
+  ports:
+    - port: 80
+      targetPort: 80
+

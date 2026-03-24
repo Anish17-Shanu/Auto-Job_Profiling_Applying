@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: autojob-worker
+  namespace: autojob
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: autojob-worker
+  template:
+    metadata:
+      labels:
+        app: autojob-worker
+    spec:
+      containers:
+        - name: worker
+          image: autojob-worker:latest
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: autojob-config
+            - secretRef:
+                name: autojob-secrets
+

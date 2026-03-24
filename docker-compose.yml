@@ -1,0 +1,51 @@
+version: "3.9"
+
+services:
+  api:
+    build:
+      context: ./backend
+    env_file:
+      - .env.example
+    environment:
+      DATABASE_URL: postgresql+psycopg2://autojob:autojob@postgres:5432/autojob
+      CORS_ORIGINS: http://localhost:8080
+    depends_on:
+      - postgres
+    ports:
+      - "8000:8000"
+
+  worker:
+    build:
+      context: ./worker
+    env_file:
+      - .env.example
+    environment:
+      API_BASE_URL: http://api:8000
+    depends_on:
+      - api
+
+  frontend:
+    build:
+      context: ./frontend
+    environment:
+      VITE_API_BASE_URL: http://localhost:8000
+    depends_on:
+      - api
+    ports:
+      - "8080:80"
+
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: autojob
+      POSTGRES_USER: autojob
+      POSTGRES_PASSWORD: autojob
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:
+

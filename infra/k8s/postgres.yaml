@@ -1,0 +1,59 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: autojob-postgres-pvc
+  namespace: autojob
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: autojob-postgres
+  namespace: autojob
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: autojob-postgres
+  template:
+    metadata:
+      labels:
+        app: autojob-postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16-alpine
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: autojob
+            - name: POSTGRES_USER
+              value: autojob
+            - name: POSTGRES_PASSWORD
+              value: autojob
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: autojob-postgres-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: autojob-postgres
+  namespace: autojob
+spec:
+  selector:
+    app: autojob-postgres
+  ports:
+    - port: 5432
+      targetPort: 5432
+
