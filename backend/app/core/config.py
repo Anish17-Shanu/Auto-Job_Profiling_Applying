@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = Field(default=720, alias="ACCESS_TOKEN_EXPIRE_MINUTES")
     database_url: str = Field(default="sqlite:///./autojob.db", alias="DATABASE_URL")
     cors_origins_raw: str = Field(default="http://localhost:5173,http://localhost:8080", alias="CORS_ORIGINS")
-    demo_admin_email: str = Field(default="admin@autojob.local", alias="DEMO_ADMIN_EMAIL")
+    demo_admin_email: str = Field(default="admin@autojobdemo.com", alias="DEMO_ADMIN_EMAIL")
     demo_admin_password: str = Field(default="ChangeMe123!", alias="DEMO_ADMIN_PASSWORD")
 
     @property
@@ -28,4 +28,3 @@ def get_settings() -> Settings:
 
 
 settings = get_settings()
-

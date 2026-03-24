@@ -9,4 +9,5 @@ node_modules/
 .DS_Store
 coverage/
 htmlcov/
-
+backend/autojob.db
+run-logs/

@@ -1,11 +1,21 @@
-from app.models.entities import ApplicationDraft, CandidateProfile, JobProfile, Organization, PipelineRun, User
+from app.models.entities import (
+    ApplicationTarget,
+    CandidateProfile,
+    ExternalJob,
+    JobSource,
+    MatchRun,
+    Organization,
+    ResumeVersion,
+    User,
+)
 
 __all__ = [
-    "ApplicationDraft",
+    "ApplicationTarget",
     "CandidateProfile",
-    "JobProfile",
+    "ExternalJob",
+    "JobSource",
+    "MatchRun",
     "Organization",
-    "PipelineRun",
+    "ResumeVersion",
     "User",
 ]
-

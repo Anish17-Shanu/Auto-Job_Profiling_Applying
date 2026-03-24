@@ -1,41 +1,49 @@
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from app.models.entities import CandidateProfile, JobProfile, PipelineRun, PipelineStatus
-from app.repositories.pipeline_repository import PipelineRepository
-from app.schemas.domain import DashboardSummary, PipelineRunRead
+from app.models.entities import ApplicationStatus, ApplicationTarget, CandidateProfile, ExternalJob, MatchRun, ResumeApprovalStatus
+from app.repositories.pipeline_repository import MatchRepository
+from app.schemas.domain import DashboardSummary, MatchRunRead
 
 
 class DashboardService:
     def __init__(self) -> None:
-        self.pipeline_repository = PipelineRepository()
+        self.match_repository = MatchRepository()
 
     def get_summary(self, session: Session, organization_id: int) -> DashboardSummary:
-        latest_runs = self.pipeline_repository.list_for_org(session, organization_id)[:5]
-        avg_score = session.scalar(
-            select(func.avg(PipelineRun.score)).where(
-                PipelineRun.organization_id == organization_id,
-                PipelineRun.status == PipelineStatus.completed,
-            )
-        )
+        latest_matches = self.match_repository.list_for_org(session, organization_id)[:5]
+        avg_score = session.scalar(select(func.avg(MatchRun.score)).where(MatchRun.organization_id == organization_id))
         return DashboardSummary(
-            jobs=session.scalar(select(func.count()).select_from(JobProfile).where(JobProfile.organization_id == organization_id)) or 0,
-            candidates=session.scalar(select(func.count()).select_from(CandidateProfile).where(CandidateProfile.organization_id == organization_id)) or 0,
-            queued_runs=session.scalar(
-                select(func.count()).select_from(PipelineRun).where(
-                    PipelineRun.organization_id == organization_id,
-                    PipelineRun.status == PipelineStatus.queued,
+            imported_jobs=session.scalar(
+                select(func.count()).select_from(ExternalJob).where(ExternalJob.organization_id == organization_id)
+            )
+            or 0,
+            candidates=session.scalar(
+                select(func.count()).select_from(CandidateProfile).where(CandidateProfile.organization_id == organization_id)
+            )
+            or 0,
+            tailored_resumes=session.scalar(
+                select(func.count()).select_from(MatchRun).where(MatchRun.organization_id == organization_id)
+            )
+            or 0,
+            approved_resumes=session.scalar(
+                select(func.count()).select_from(MatchRun).where(
+                    MatchRun.organization_id == organization_id,
+                    MatchRun.approval_status == ResumeApprovalStatus.approved,
                 )
             )
             or 0,
-            completed_runs=session.scalar(
-                select(func.count()).select_from(PipelineRun).where(
-                    PipelineRun.organization_id == organization_id,
-                    PipelineRun.status == PipelineStatus.completed,
+            application_targets=session.scalar(
+                select(func.count()).select_from(ApplicationTarget).where(ApplicationTarget.organization_id == organization_id)
+            )
+            or 0,
+            submitted_applications=session.scalar(
+                select(func.count()).select_from(ApplicationTarget).where(
+                    ApplicationTarget.organization_id == organization_id,
+                    ApplicationTarget.status == ApplicationStatus.submitted,
                 )
             )
             or 0,
             avg_score=round(float(avg_score or 0.0), 2),
-            latest_runs=[PipelineRunRead.model_validate(run) for run in latest_runs],
+            latest_matches=[MatchRunRead.model_validate(run) for run in latest_matches],
         )
-

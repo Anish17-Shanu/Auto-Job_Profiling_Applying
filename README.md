@@ -35,6 +35,5 @@ python -m app.runner
 
 Default login:
 
-- `admin@autojob.local`
+- `admin@autojobdemo.com`
 - `ChangeMe123!`
-

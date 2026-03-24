@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.core.security import hash_password
-from app.models.entities import CandidateProfile, JobProfile, Organization, User, UserRole
+from app.models.entities import CandidateProfile, Organization, User, UserRole
 
 
 def seed_demo_data(session: Session) -> None:
@@ -26,24 +26,8 @@ def seed_demo_data(session: Session) -> None:
             )
         )
 
-    has_job = session.scalar(select(JobProfile.id).where(JobProfile.organization_id == organization.id))
-    if not has_job:
-        session.add(
-            JobProfile(
-                organization_id=organization.id,
-                title="Senior Product Analyst",
-                company="Northstar Talent",
-                location="Remote",
-                employment_type="Full-time",
-                description="Lead analytics initiatives and translate business questions into measurable product insights.",
-                required_skills=["SQL", "Python", "A/B Testing", "Stakeholder Management", "Analytics"],
-                preferred_skills=["dbt", "Looker", "Product Strategy"],
-                salary_range="$110k-$140k",
-            )
-        )
-
-    has_candidate = session.scalar(select(CandidateProfile.id).where(CandidateProfile.organization_id == organization.id))
-    if not has_candidate:
+    candidate = session.scalar(select(CandidateProfile).where(CandidateProfile.email == "avery.singh@example.com"))
+    if not candidate:
         session.add(
             CandidateProfile(
                 organization_id=organization.id,
@@ -51,11 +35,13 @@ def seed_demo_data(session: Session) -> None:
                 email="avery.singh@example.com",
                 years_experience=6,
                 target_role="Product Analyst",
-                skills=["SQL", "Python", "Looker", "Experimentation", "Communication"],
-                summary="Product analyst focused on growth analytics, funnel optimization, and stakeholder-facing insight delivery.",
-                resume_text="Built SQL pipelines, Python notebooks, executive dashboards, and experimentation workflows.",
+                skills=["SQL", "Python", "Looker", "Experimentation", "Stakeholder Management"],
+                summary="Product analyst focused on growth analytics, experimentation, and stakeholder-facing insight delivery.",
+                resume_text=(
+                    "Experience: Built SQL pipelines, Python notebooks, dashboarding workflows, and decision support for product teams.\n"
+                    "Achievements: Improved funnel conversion analysis, experimentation velocity, and stakeholder reporting quality."
+                ),
             )
         )
 
     session.commit()
-

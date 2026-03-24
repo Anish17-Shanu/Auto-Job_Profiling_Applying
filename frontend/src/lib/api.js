@@ -19,6 +19,17 @@ async function request(path, options = {}) {
   return response.json();
 }
 
+function withQuery(path, params = {}) {
+  const search = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== "" && value !== false) {
+      search.set(key, value);
+    }
+  });
+  const query = search.toString();
+  return query ? `${path}?${query}` : path;
+}
+
 export async function login(email, password) {
   const data = await request("/auth/login", {
     method: "POST",
@@ -30,17 +41,20 @@ export async function login(email, password) {
 
 export const getCurrentUser = () => request("/auth/me");
 export const getDashboard = () => request("/dashboard/summary");
-export const listJobs = () => request("/profiles/jobs");
+export const listProviders = () => request("/profiles/providers");
+export const listSources = () => request("/profiles/sources");
+export const updateSourceAuth = (sourceId, payload) =>
+  request(`/profiles/sources/${sourceId}/auth`, { method: "POST", body: JSON.stringify(payload) });
+export const importSource = (payload) => request("/profiles/sources/import", { method: "POST", body: JSON.stringify(payload) });
 export const listCandidates = () => request("/profiles/candidates");
-export const listRuns = () => request("/profiles/pipeline-runs");
-export const getDraft = (pipelineRunId) => request(`/applications/drafts/${pipelineRunId}`);
-
-export const createJob = (payload) =>
-  request("/profiles/jobs", { method: "POST", body: JSON.stringify(payload) });
-
-export const createCandidate = (payload) =>
-  request("/profiles/candidates", { method: "POST", body: JSON.stringify(payload) });
-
-export const createRun = (payload) =>
-  request("/profiles/pipeline-runs", { method: "POST", body: JSON.stringify(payload) });
-
+export const createCandidate = (payload) => request("/profiles/candidates", { method: "POST", body: JSON.stringify(payload) });
+export const listJobs = (params) => request(withQuery("/profiles/jobs", params));
+export const listMatches = () => request("/profiles/matches");
+export const generateMatches = (payload) => request("/profiles/matches/generate", { method: "POST", body: JSON.stringify(payload) });
+export const setMatchApproval = (matchRunId, approved) =>
+  request(`/profiles/matches/${matchRunId}/approval`, { method: "POST", body: JSON.stringify({ approved }) });
+export const listApplicationTargets = () => request("/applications/targets");
+export const queueApplicationTargets = (matchRunIds) =>
+  request("/applications/targets/queue", { method: "POST", body: JSON.stringify({ match_run_ids: matchRunIds }) });
+export const submitApplicationTargets = (applicationIds) =>
+  request("/applications/targets/submit", { method: "POST", body: JSON.stringify({ application_target_ids: applicationIds }) });
