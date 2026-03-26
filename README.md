@@ -1,5 +1,10 @@
 # Auto-Job Profiling Applying
 
+## Creator
+
+This project was created, written, and maintained by **Anish Kumar (ANISH KUMAR)**.
+All primary documentation in this README is presented as the work of **Anish Kumar**.
+
 Production-minded SaaS platform for job intake, candidate profiling, fit analysis, tailored resume generation, and application drafting.
 
 ## Stack
